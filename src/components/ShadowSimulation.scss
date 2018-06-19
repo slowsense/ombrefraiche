@@ -1,0 +1,30 @@
+#shadow-simulation {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+#shadow-display {   
+    margin: auto;
+    display: block;
+    height: 100%;
+    width: 100%;
+}
+
+#object {
+    stroke: none;
+    fill: green;
+}
+
+#northIndicator {
+    fill: red;
+}
+
+#sunIndicator {
+    fill: orange;
+}
+
+.shadow {
+    fill: black;
+    fill-opacity: .25;
+}

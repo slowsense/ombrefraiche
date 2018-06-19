@@ -1,0 +1,10 @@
+<div id="shadow-simulation">
+    <svg id="shadow-display">
+        <circle :cx="svgWidth / 2" :cy="svgHeight / 2" :r="objectRadius * svgMin" id="object" />
+        <circle :cx="northIndicatorX" :cy="northIndicatorY" :r="northIndicatorRadius * svgMin" id="northIndicator" />
+        <circle :cx="sunIndicatorX" :cy="sunIndicatorY" :r="sunIndicatorRadius * svgMin" id="sunIndicator" />
+        <template v-for="shadow in shadows">
+            <ellipse :cx="shadow.centerX" :cy="shadow.centerY" :rx="shadow.radiusX * svgMin" :ry="shadow.radiusY * svgMin" class="shadow" />
+        </template>
+    </svg>
+</div>
