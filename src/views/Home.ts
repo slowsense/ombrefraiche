@@ -12,7 +12,7 @@ export default class Home extends Vue {
   public duration: number = 3;
 
   public get durationAsString(): string {
-    return this.duration.toString();
+    return this.duration.toString(); 
   }
 
   public set durationAsString(value: string) {

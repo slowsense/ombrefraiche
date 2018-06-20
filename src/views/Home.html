@@ -1,6 +1,12 @@
 <div class="content">
     <div id="title">
         <div class="display-4">Ombre fraîche</div>
+        <small>
+            <span class="circle-green"></span> l'arbre
+            <span class="circle-orange"></span> le soleil
+            <span class="circle-grey"></span> l'ombre
+            <span class="circle-red"></span> le Nord
+        </small>
     </div>
     <div id="visual">
         <shadow-simulation :duration="duration" />
@@ -18,7 +24,12 @@
             <option value="9">Pendant 9H</option>
             <option value="10">Pendant 10H</option>
         </select>
-        <div id="position"></div>
+        <div>
+            <small>
+                Indiquez le temps que vous souhaitez rester garé et pointez ensuite votre téléphone sur un arbre du parking pour
+                voir comment l'ombre va se déplacer<br/>
+                version 0.02
+            </small>
+        </div>
     </div>
-    <div><small>version 0.02</small></div>
 </div>

@@ -46,7 +46,7 @@ export default class ShadowSimulation extends Vue {
     window.addEventListener('resize', this.refreshSize);
     window.addEventListener('deviceorientation', this.catchNewOrientation);
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(this.catchNewGeoPosition, (e) => alert(e.message));
+      this.watchIdentifier = navigator.geolocation.watchPosition(this.catchNewGeoPosition);
     }
   }
 

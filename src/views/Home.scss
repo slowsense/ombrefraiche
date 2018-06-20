@@ -10,13 +10,40 @@ $my-grey: #bbb;
     margin: auto auto;
 }
 #title {
-    height: 10%;
+    height: 15%;
 }
 #visual {
-    height: 65%;
+    height: 60%;
 }
 #params {
     height: 20%;
     margin-left: 10%;
     margin-right: 10%;
+}
+
+.circle {
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+}
+
+.circle-green {
+    @extend .circle;
+    background-color: green;
+}
+
+.circle-orange {
+    @extend .circle;
+    background-color: orange;
+}
+
+.circle-red {
+    @extend .circle;
+    background-color: red;
+}
+
+.circle-grey {
+    @extend .circle;
+    background-color: grey;
 }
