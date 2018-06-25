@@ -1,5 +1,6 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Shadow } from '@/components/Shadow';
+import './DateExtension';
 
 @Component
 export default class ShadowSimulation extends Vue {
@@ -9,24 +10,23 @@ export default class ShadowSimulation extends Vue {
   public svgMin: number = 0;
 
   // object
-  public readonly objectRadius: number = .04;
+  public readonly objectRadius: number = .08;
 
   // north indicator
   public readonly northIndicatorRadius: number = .005;
-  private readonly northIndicatorRadiusOrbit: number = .7;
-  public northIndicatorX: number = 0;
-  public northIndicatorY: number = 0;
+  public readonly northIndicatorRadiusOrbit: number = .480;
+  public northIndicatorTransform: string = 'rotate(0)';
 
   // sun
   private SunCalc = require('suncalc');
-  public readonly sunIndicatorRadius: number = 0.02;
-  private readonly sunIndicatorRadiusOrbit: number = 0.6;
   private sunPosition: any;
-  public sunIndicatorX: number = 0;
-  public sunIndicatorY: number = 0;
+  public readonly sunIndicatorRadius: number = 0.02;
+  private readonly sunIndicatorMaxRadiusOrbit: number = 0.3;
+  public sunIndicatorRadiusOrbit: number = 0;
+  public sunIndicatorTransform: string = 'rotate(0)';
 
   // orientation
-  private currentOrientation: {
+  public currentOrientation: {
     alpha: number | null,
     beta: number | null,
     gamma: number | null} = { alpha: null, beta: null, gamma: null };
@@ -45,23 +45,26 @@ export default class ShadowSimulation extends Vue {
     this.refreshSize();
     window.addEventListener('resize', this.refreshSize);
     window.addEventListener('deviceorientation', this.catchNewOrientation);
-    if (navigator.geolocation) {
-      this.watchIdentifier = navigator.geolocation.watchPosition(this.catchNewGeoPosition);
-    }
+    window.addEventListener('visibilitychange', this.refreshLocation);
+    this.refreshLocation();
   }
 
   private unmounted() {
     window.removeEventListener('resize', this.refreshSize);
     window.removeEventListener('deviceorientation', this.catchNewOrientation);
-    if (this.watchIdentifier) {
-      navigator.geolocation.clearWatch(this.watchIdentifier);
-    }
+    window.removeEventListener('visibilitychange', this.refreshLocation);
   }
 
   private refreshSize() {
     this.svgWidth = this.getSvgWidth();
     this.svgHeight = this.getSvgHeight();
     this.svgMin = Math.min(this.svgWidth, this.svgHeight);
+  }
+
+  private refreshLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(this.catchNewGeoPosition);
+    }
   }
 
   private getSvgWidth(): number {
@@ -94,19 +97,15 @@ export default class ShadowSimulation extends Vue {
     this.geoPosition = position;
     this.setNorthIndicatorPosition();
     this.setSunIndicatorPosition();
-    // this.setShadows();
+    this.setShadows();
   }
 
   private setNorthIndicatorPosition() {
     if (this.currentOrientation.alpha != null) {
-      this.northIndicatorX = this.svgWidth / 2
-        + Math.cos(-this.toTrigonometricAngle(this.currentOrientation.alpha))
-        * this.northIndicatorRadiusOrbit
-        * (this.svgMin / 2);
-      this.northIndicatorY = this.svgHeight / 2
-        - Math.sin(-this.toTrigonometricAngle(this.currentOrientation.alpha))
-        * this.northIndicatorRadiusOrbit
-        * (this.svgMin / 2);
+      this.northIndicatorTransform =
+        `rotate(${-this.currentOrientation.alpha}
+          ${this.svgWidth / 2}
+          ${this.svgHeight / 2})`;
     }
   }
 
@@ -117,44 +116,50 @@ export default class ShadowSimulation extends Vue {
         this.geoPosition.coords.latitude,
         this.geoPosition.coords.longitude);
       if (this.sunPosition && this.currentOrientation.alpha) {
-        const sunAngle = 3 / 2 * Math.PI + this.toRadians(this.currentOrientation.alpha) - this.sunPosition.azimuth;
-        this.sunIndicatorX = this.svgWidth / 2
-          + Math.cos(-sunAngle)
-          * Math.cos(this.sunPosition.altitude)
-          * this.sunIndicatorRadiusOrbit
-          * (this.svgMin / 2);
-        this.sunIndicatorY = this.svgHeight / 2
-          + Math.sin(-sunAngle)
-          * Math.cos(this.sunPosition.altitude)
-          * this.sunIndicatorRadiusOrbit
-          * (this.svgMin / 2);
+        this.sunIndicatorRadiusOrbit = this.sunIndicatorMaxRadiusOrbit * Math.cos(this.sunPosition.altitude);
+        this.sunIndicatorTransform =
+          `rotate(${((this.sunPosition.azimuth * 180) / Math.PI) - 180 - this.currentOrientation.alpha}
+            ${this.svgWidth / 2}
+            ${this.svgHeight / 2})`;
       }
     }
   }
 
-  private setShadows() {
-    // this.shadows = new Array<Shadow>();
-    // for (let index = 0; index < this.duration; index++) {
-    //   this.shadows.push(this.createShadow());
-    // }
+  @Watch('duration')
+  private durationChanged(duration: number, oldDuration: number) {
+    this.setShadows();
   }
 
-  private createShadow(): Shadow {
+  private setShadows() {
+    this.shadows = new Array<Shadow>();
+    for (let index = 0; index <= this.duration; index++) {
+      let shadow = this.createShadow(index);
+      if (shadow != null) {
+        this.shadows.push(shadow);
+      }
+    }
+  }
+
+  private createShadow(hourOffset: number): Shadow | null {
+
+    if (this.currentOrientation.alpha === null) return null;
+
     const shadow = new Shadow();
-    const shadowLength: number = .5;
+    const dateOfShadow = (new Date()).addHours(hourOffset);
+    const sunPosition = this.SunCalc.getPosition(
+      dateOfShadow,
+      this.geoPosition.coords.latitude,
+      this.geoPosition.coords.longitude);
+    const shadowLength: number = 4 / Math.sin(sunPosition.altitude) * (this.objectRadius / 2) * this.svgMin;
     shadow.centerX = this.svgWidth / 2;
-    shadow.centerY = this.svgHeight / 2 + shadowLength / 2;
-    shadow.radiusX = this.objectRadius;
+    shadow.centerY = this.svgHeight / 2 - this.objectRadius * this.svgMin + (shadowLength / 2);
+    shadow.radiusX = this.objectRadius * this.svgMin;
     shadow.radiusY = shadowLength / 2;
+    shadow.angle = ((sunPosition.azimuth * 180) / Math.PI) - 180 - this.currentOrientation.alpha;
+    shadow.transform =  `rotate(${shadow.angle}
+      ${this.svgWidth / 2}
+      ${this.svgHeight / 2})`;
     return shadow;
   }
 
-  private toTrigonometricAngle(angle: number): number {
-    return 3 * Math.PI / 2 - this.toRadians(angle);
-  }
-
-  private toRadians(angle: number): number {
-    return angle * (Math.PI / 180);
-  }
 }
-

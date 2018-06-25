@@ -12,7 +12,11 @@
         <shadow-simulation :duration="duration" />
     </div>
     <div id="params">
+        <label for="parkingTime">
+            Combien de temps souhaitez-vous stationner ? 
+        </label>
         <select name="parkingTime" id="parkingTime" v-model="durationAsString" class="form-control">
+            <option value="0">Moins d'une heure</option>
             <option value="1">Pendant 1H</option>
             <option value="2">Pendant 2H</option>
             <option value="3">Pendant 3H</option>
@@ -26,9 +30,7 @@
         </select>
         <div>
             <small>
-                Indiquez le temps que vous souhaitez rester garé et pointez ensuite votre téléphone sur un arbre du parking pour
-                voir comment l'ombre va se déplacer<br/>
-                version 0.02
+                <br/> version 0.05
             </small>
         </div>
     </div>
