@@ -33,7 +33,8 @@ export default class ShadowSimulation extends Vue {
 
   // geoposition
   private geoPosition!: Position;
-  private watchIdentifier!: number;
+  private internalGeolocationAllowed: boolean = false;
+  private internalGeolocationAvailable: boolean = true;
 
   // shadows
   public shadows = new Array<Shadow>();
@@ -45,8 +46,11 @@ export default class ShadowSimulation extends Vue {
     this.refreshSize();
     window.addEventListener('resize', this.refreshSize);
     window.addEventListener('deviceorientation', this.catchNewOrientation);
-    window.addEventListener('visibilitychange', this.refreshLocation);
-    this.refreshLocation();
+    this.internalGeolocationAllowed = (localStorage.getItem('geoLocationAllowed') === '1');
+    if (this.internalGeolocationAllowed) {
+      window.addEventListener('visibilitychange', this.refreshLocation);
+      this.refreshLocation();
+    }
   }
 
   private unmounted() {
@@ -61,9 +65,31 @@ export default class ShadowSimulation extends Vue {
     this.svgMin = Math.min(this.svgWidth, this.svgHeight);
   }
 
+  public geolocationAllowed(): boolean {
+    return this.internalGeolocationAllowed;
+  }
+
+  public geolocationAvailable(): boolean {
+    return this.internalGeolocationAvailable;
+  }
+
+  public compassAvailable(): boolean {
+    return this.currentOrientation.alpha !== null;
+  }
+
+  public allowGeolocation() {
+    localStorage.setItem('geoLocationAllowed', '1');
+    this.internalGeolocationAllowed = true;
+    this.refreshSize();
+    this.refreshLocation();
+    window.addEventListener('visibilitychange', this.refreshLocation);
+  }
+
   private refreshLocation() {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(this.catchNewGeoPosition);
+      navigator.geolocation.getCurrentPosition(
+        this.catchNewGeoPosition,
+        () => this.internalGeolocationAvailable = false);
     }
   }
 
@@ -84,6 +110,7 @@ export default class ShadowSimulation extends Vue {
   }
 
   private catchNewOrientation(event: DeviceOrientationEvent) {
+    this.refreshSize();
     this.currentOrientation = { alpha: event.alpha, beta: event.beta, gamma: event.gamma };
     if ((event as any).webkitCompassHeading) {
       this.currentOrientation.alpha = (event as any).webkitCompassHeading;
@@ -94,6 +121,8 @@ export default class ShadowSimulation extends Vue {
   }
 
   private catchNewGeoPosition(position: Position) {
+    this.refreshSize();
+    this.internalGeolocationAvailable = true;
     this.geoPosition = position;
     this.setNorthIndicatorPosition();
     this.setSunIndicatorPosition();
@@ -133,7 +162,7 @@ export default class ShadowSimulation extends Vue {
   private setShadows() {
     this.shadows = new Array<Shadow>();
     for (let index = 0; index <= this.duration; index++) {
-      let shadow = this.createShadow(index);
+      const shadow = this.createShadow(index);
       if (shadow != null) {
         this.shadows.push(shadow);
       }
@@ -142,7 +171,9 @@ export default class ShadowSimulation extends Vue {
 
   private createShadow(hourOffset: number): Shadow | null {
 
-    if (this.currentOrientation.alpha === null) return null;
+    if (this.currentOrientation.alpha === null) {
+      return null;
+    }
 
     const shadow = new Shadow();
     const dateOfShadow = (new Date()).addHours(hourOffset);
@@ -151,6 +182,10 @@ export default class ShadowSimulation extends Vue {
       this.geoPosition.coords.latitude,
       this.geoPosition.coords.longitude);
     const shadowLength: number = 4 / Math.sin(sunPosition.altitude) * (this.objectRadius / 2) * this.svgMin;
+    if (shadowLength < 0) {
+      return null;
+    }
+
     shadow.centerX = this.svgWidth / 2;
     shadow.centerY = this.svgHeight / 2 - this.objectRadius * this.svgMin + (shadowLength / 2);
     shadow.radiusX = this.objectRadius * this.svgMin;

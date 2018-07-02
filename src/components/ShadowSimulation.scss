@@ -2,13 +2,24 @@
     height: 100%;
     display: flex;
     align-items: center;
+    position: relative;
+    justify-content:center;
 }
 
-#shadow-display {   
+#shadow-display, #shadow-display svg {   
     margin: auto;
     display: block;
     height: 100%;
     width: 100%;
+    position: absolute;
+    z-index: 1;
+}
+
+#geolocation-allow, #compass-not-available, #geolocation-not-available {
+    width: 60%;
+    position: absolute;
+    background-color: #fff;
+    z-index: 2;
 }
 
 #object {

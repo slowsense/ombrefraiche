@@ -1,7 +1,15 @@
+@import '../../node_modules/bootstrap/scss/bootstrap-reboot';
 
-@import '../../node_modules/bootstrap/scss/bootstrap';
+$light-grey: #ddd;
+$grey: #aaa;
 
-$my-grey: #bbb;
+html, button {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+}
+
+h1 {
+    font-weight: lighter;
+}
 
 .content {
     text-align: center;
@@ -46,4 +54,13 @@ $my-grey: #bbb;
 .circle-grey {
     @extend .circle;
     background-color: grey;
+}
+
+button {
+    border: 0;
+    background: $light-grey;
+    box-shadow: none;
+    border-radius: 3px;
+    padding: 10px;
+    border: $grey solid 1px;
 }

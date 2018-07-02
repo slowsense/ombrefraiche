@@ -1,6 +1,6 @@
 <div class="content">
     <div id="title">
-        <div class="display-4">Ombre fraîche</div>
+        <h1>Ombre fraîche</h1>
         <small>
             <span class="circle-green"></span> l'arbre
             <span class="circle-orange"></span> le soleil
@@ -13,24 +13,25 @@
     </div>
     <div id="params">
         <label for="parkingTime">
-            Combien de temps souhaitez-vous stationner ? 
+            Temps de stationnement
         </label>
+        <br/>
         <select name="parkingTime" id="parkingTime" v-model="durationAsString" class="form-control">
-            <option value="0">Moins d'une heure</option>
-            <option value="1">Pendant 1H</option>
-            <option value="2">Pendant 2H</option>
-            <option value="3">Pendant 3H</option>
-            <option value="4">Pendant 4H</option>
-            <option value="5">Pendant 5H</option>
-            <option value="6">Pendant 6H</option>
-            <option value="7">Pendant 7H</option>
-            <option value="8">Pendant 8H</option>
-            <option value="9">Pendant 9H</option>
-            <option value="10">Pendant 10H</option>
+            <option value="0">moins d'1H</option>
+            <option value="1">1H</option>
+            <option value="2">2H</option>
+            <option value="3">3H</option>
+            <option value="4">4H</option>
+            <option value="5">5H</option>
+            <option value="6">6H</option>
+            <option value="7">7H</option>
+            <option value="8">8H</option>
+            <option value="9">9H</option>
+            <option value="10">10H</option>
         </select>
         <div>
             <small>
-                <br/> version 0.05
+                <br/> version 0.06
             </small>
         </div>
     </div>
