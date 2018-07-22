@@ -112,8 +112,8 @@ export default class ShadowSimulation extends Vue {
   private catchNewOrientation(event: DeviceOrientationEvent) {
     this.refreshSize();
     this.currentOrientation = { alpha: event.alpha, beta: event.beta, gamma: event.gamma };
-    if ((event as any).webkitCompassHeading) {
-      this.currentOrientation.alpha = (event as any).webkitCompassHeading;
+    if ((event as any).webkitCompassHeading || (event as any).compassHeading) {
+      this.currentOrientation.alpha = (event as any).webkitCompassHeading || (event as any).compassHeading;
     }
     this.setNorthIndicatorPosition();
     this.setSunIndicatorPosition();

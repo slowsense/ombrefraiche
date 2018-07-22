@@ -7,13 +7,14 @@
             </template>
             <circle :cx="svgWidth / 2" :cy="svgHeight / 2" :r="objectRadius * svgMin" id="object" />
             <circle :cx="svgWidth / 2" :cy="svgHeight / 2 - northIndicatorRadiusOrbit * svgMin" :r="northIndicatorRadius * svgMin" id="northIndicator"
-            :transform="northIndicatorTransform" />
+                :transform="northIndicatorTransform" />
             <circle :cx="svgWidth / 2" :cy="svgHeight / 2 - sunIndicatorRadiusOrbit * svgMin" :r="sunIndicatorRadius * svgMin" id="sunIndicator"
-            :transform="sunIndicatorTransform" />
+                :transform="sunIndicatorTransform" />
         </svg>
     </div>
     <div id="compass-not-available" v-show="!compassAvailable()">
-        <p>Pour faire fonctionner cette application, nous avons besoin d'une boussole. Votre ordinateur/téléphone ne nous le permet pas.</p>
+        <p>Pour faire fonctionner cette application, nous avons besoin d'une boussole. Votre ordinateur/téléphone ne nous le
+            permet pas.</p>
     </div>
     <div id="geolocation-not-available" v-show="!geolocationAvailable()">
         <p>Pour faire fonctionner cette application, nous avons besoin de vous géolocaliser mais votre navigateur ne nous le
